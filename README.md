@@ -28,7 +28,7 @@ Everything below is run from the root of this repository. All data paths are res
 
 ### 1. Download the SpaRED datasets
 
-Download the datasets from the [SpaRED webpage](https://bcv-uniandes.github.io/spared_webpage/index) (linked from there to a Google Drive folder) and place every `.h5ad` file in `data/SparedData/`, named after its dataset:
+Download the datasets from the [SpaRED webpage](https://bcv-uniandes.github.io/spared_webpage/index) (linked from there to a Google Drive folder) and place them in `data/SparedData/` at the root of the repository, with every `.h5ad` file named after its dataset:
 
 ```
 data/SparedData/
@@ -47,7 +47,7 @@ data/SparedData/
 
 ### 2. Download the precomputed embeddings
 
-HyCLoST works on frozen, precomputed features: [UNI2-h](https://huggingface.co/MahmoodLab/UNI2-h) features of the histology patches and [Geneformer](https://huggingface.co/ctheodoris/Geneformer) embeddings of the gene expression vectors. Download them from `<EMBEDDINGS_DRIVE_LINK>` and place them in `embeddings/`:
+HyCLoST works on frozen, precomputed features: [UNI2-h](https://huggingface.co/MahmoodLab/UNI2-h) features of the histology patches and [Geneformer](https://huggingface.co/ctheodoris/Geneformer) embeddings of the gene expression vectors. Download them from `<EMBEDDINGS_DRIVE_LINK>` and place them in `embeddings/` at the root of the repository:
 
 ```
 embeddings/
@@ -65,11 +65,10 @@ embeddings/
 
 - `<x>_<y>` are the spot's spatial coordinates (`adata.obsm["spatial"]`), e.g. `10038.0_2638.0.npy`.
 - Each patch feature file holds 8 vectors, one per symmetry of the patch (the 8 flips/rotations). During training one is sampled at random; at test time `--eight_sym_test` averages the predictions over all 8, otherwise only the original one is used.
-- 11 datasets have `train`/`val`/`test` splits and 15 have only `train`/`val`. When there is no `test` split, the `val` split is used as the test set.
 
 ### 3. Download the checkpoints
 
-Download the checkpoints from `<CHECKPOINTS_DRIVE_LINK>` and place the `checkpoints/` folder at the root of the repository, next to `scripts/`. Each dataset has one model in `best_run/`:
+Download the checkpoints from `<CHECKPOINTS_DRIVE_LINK>` and place the `checkpoints/` folder at the root of the repository. Each dataset has one model in `best_run/`:
 
 ```
 checkpoints/
