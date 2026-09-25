@@ -195,7 +195,7 @@ def main(_A: argparse.Namespace):
     # Start wandb configs
     if dist.is_main_process():
         wandb.init(
-            project='MERU',
+            project='HyCLoST',
             entity = 'spared_v2',
             config=full_config,
             name=exp_name

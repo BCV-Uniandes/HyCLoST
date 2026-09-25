@@ -89,7 +89,6 @@ HyCLoST/
 ├── meru/                                # model, losses, data, evaluation
 ├── scripts/
 │   ├── train_spared.py                  # training and inference
-│   └── evaluate_spared.py
 ├── UNI/
 ├── data/
 │   └── SparedData/
@@ -124,12 +123,10 @@ CUDA_VISIBLE_DEVICES=0 python scripts/train_spared.py \
     --ckpts_path ./checkpoints/${DATASET}/best_run/checkpoint_best.pth
 ```
 
-The test MSE and PCC-Gene are printed at the end. With `--only_test` nothing is written to disk.
+The test MSE and PCC-Gene are printed at the end.
 
-- `--top_k 80` is the number of nearest gene embeddings averaged to make each prediction.
-- `--num_genes 768` is the size of the Geneformer embedding (not the number of genes of the dataset) and must stay at 768 together with `--encode_genes`.
 - If the port in `--dist-url` is already in use, pick another one.
-- The script logs to [Weights & Biases](https://wandb.ai) (`project=MERU`, `entity=spared_v2`). If you do not have access to that entity, run with `WANDB_MODE=disabled`.
+- The script logs to [Weights & Biases](https://wandb.ai) (`project=HyCloST`, `entity=spared_v2`. set in the `wandb.init(...)` call of  `scripts/train_spared.py`). To run with [Weights & Biases](https://wandb.ai), replace `entity` with your own username or team, or run with `WANDB_MODE=disabled`.
 
 ## Training
 
@@ -152,7 +149,7 @@ CUDA_VISIBLE_DEVICES=0 python scripts/train_spared.py \
     --eight_sym_test
 ```
 
-Training hyperparameters (120,000 iterations, batch size 128, AdamW with lr 5e-4 and 4,000 warmup steps, mixed precision, seed 0) are defined in [configs/train_meru_spared.py](configs/train_meru_spared.py). Every `--validation-period` iterations (default 100) the model is validated on the `val` split, using the MSE of the top-`k` prediction. When training ends, the best checkpoint is reloaded and evaluated on the test split.
+Training hyperparameters are defined in [configs/train_meru_spared.py](configs/train_meru_spared.py). 
 
 ### What is saved
 
@@ -172,7 +169,6 @@ Each run creates a folder named after the start time:
 
 - **Checkpoint:** `k_<top_k>/checkpoint_best.pth` is overwritten every time the validation MSE improves, so at the end it holds the model with the lowest validation MSE, not the last one. It is a dictionary with `model`, `optimizer`, `scheduler`, `scaler` (the training states) and `iteration` (when it was saved). The best validation MSE can occur early in training, so check `iteration`.
 - **Predictions:** `test.pt` is a dictionary with `prediction` (the predicted expression) and `c_StepB_log1p` (the ground truth), both NumPy arrays of shape `(num_test_spots, num_genes)`.
-- **Using your checkpoint:** copy `checkpoint_best.pth` to `checkpoints/<dataset>/best_run/`, or pass its path with `--ckpts_path`.
 
 ## Citation
 
