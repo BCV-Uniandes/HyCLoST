@@ -37,6 +37,8 @@ from UNI.spared.configs import EightSymmetry
 
 __all__ = ["callable_to_str", "LazyCall", "LazyConfig", "LazyFactory"]
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
 
 _CFG_PACKAGE_NAME = "meru._cfg_loader"
 """
@@ -294,19 +296,19 @@ class SpaREDData(torch.utils.data.Dataset):
 
         # Load CSV containing gene encoded data
         if self.args.gene_encoder == "geneformer":
-            self.gene_encoded = pd.read_csv(f"embs_geneformer/{self.args.dataset}/{self.split_name}/encoded_genes.csv", index_col=0)
+            self.gene_encoded = pd.read_csv(f"{REPO_ROOT}/embeddings/embs_geneformer/{self.args.dataset}/{self.split_name}/encoded_genes.csv", index_col=0)
             self.gene_encoded = torch.tensor(self.gene_encoded.values, dtype=torch.float32)
-        
+
         elif self.args.gene_encoder == "autoencoder":
-            self.gene_encoded = torch.load(f"/home/pcardenasg/CVPR26/gene_encoder/results/{self.args.prediction_layer}/{self.args.dataset}/gene_embeddings_{self.split_name}.pt", weights_only=False)
+            self.gene_encoded = torch.load(f"{REPO_ROOT}/embeddings/results/{self.args.prediction_layer}/{self.args.dataset}/gene_embeddings_{self.split_name}.pt", weights_only=False)
             self.gene_encoded = torch.tensor(self.gene_encoded, dtype=torch.float32)
 
         elif self.args.gene_encoder == "language":
-            self.gene_encoded = torch.load(f"/home/pcardenasg/CVPR26/gene_encoder/lang_embeds/{self.args.prediction_layer}/{self.args.dataset}/lang_gene_embeddings_{self.split_name}.pt", weights_only=False)
+            self.gene_encoded = torch.load(f"{REPO_ROOT}/embeddings/lang_embeds/{self.args.prediction_layer}/{self.args.dataset}/lang_gene_embeddings_{self.split_name}.pt", weights_only=False)
             self.gene_encoded = torch.tensor(self.gene_encoded, dtype=torch.float32)
 
         elif self.args.gene_encoder == "nicheformer":
-            self.gene_encoded = np.load(f"/home/pcardenasg/nicheformer/spared_embeddings/{self.args.prediction_layer}/{self.args.dataset}/{self.split_name}.npy")
+            self.gene_encoded = np.load(f"{REPO_ROOT}/embeddings/spared_embeddings/{self.args.prediction_layer}/{self.args.dataset}/{self.split_name}.npy")
             self.gene_encoded = torch.tensor(self.gene_encoded, dtype=torch.float32)
 
         if not self.args.raw_patches:
@@ -317,9 +319,9 @@ class SpaREDData(torch.utils.data.Dataset):
                 self.embeddings = []
                 for idx in range(len(self.adata)):
                     if self.args.eight_sym_test and split_name != "train":
-                        self.embeddings.append(np.load(f"UNI/aug_features/{self.args.dataset}/{self.split_name}/{float(self.IDs[idx][0])}_{float(self.IDs[idx][1])}.npy"))
+                        self.embeddings.append(np.load(f"{REPO_ROOT}/embeddings/aug_features/{self.args.dataset}/{self.split_name}/{float(self.IDs[idx][0])}_{float(self.IDs[idx][1])}.npy"))
                     else:
-                        self.embeddings.append(np.load(f"UNI/features/{self.args.dataset}/{self.split_name}/{float(self.IDs[idx][0])}_{float(self.IDs[idx][1])}.npy"))
+                        self.embeddings.append(np.load(f"{REPO_ROOT}/embeddings/features/{self.args.dataset}/{self.split_name}/{float(self.IDs[idx][0])}_{float(self.IDs[idx][1])}.npy"))
                 self.embeddings = torch.tensor(self.embeddings)
 
             else:
@@ -327,7 +329,7 @@ class SpaREDData(torch.utils.data.Dataset):
                 # Retrieve image embeddings created with image transformations for data augmentation
                 self.embeddings = []
                 for idx in range(len(self.adata)):
-                    self.embeddings.append(np.load(f"UNI/{embs_folder}/{self.args.dataset}/{self.split_name}/{float(self.IDs[idx][0])}_{float(self.IDs[idx][1])}.npy"))
+                    self.embeddings.append(np.load(f"{REPO_ROOT}/embeddings/{embs_folder}/{self.args.dataset}/{self.split_name}/{float(self.IDs[idx][0])}_{float(self.IDs[idx][1])}.npy"))
                 self.embeddings = torch.tensor(self.embeddings)
 
         else:

@@ -29,8 +29,8 @@ from omegaconf import OmegaConf
 from datetime import datetime
 from hydra.utils import instantiate
 
-meru_path = Path(__file__).parent.parent
-sys.path.append(str(meru_path))
+REPO_ROOT = Path(__file__).parent.parent
+sys.path.append(str(REPO_ROOT))
 
 import meru.utils.distributed as dist
 from meru.config import LazyConfig, LazyFactory, SpaREDData
@@ -233,8 +233,7 @@ def main(_A: argparse.Namespace):
             logger.info(f"{arg:<20}: {getattr(_A, arg)}")
 
     else:
-        output_dir = os.path.join(os.path.dirname(_A.ckpts_path), str(_A.top_k))
-        os.makedirs(output_dir, exist_ok=True)
+        output_dir = None
 
     # -------------------------------------------------------------------------
     #   INSTANTIATE ALL OBJECTS FOR TRAINING.
@@ -247,9 +246,7 @@ def main(_A: argparse.Namespace):
 
     # Prepare data and dataloaders
 
-    #dataloader = LazyFactory.build_dataloader(_C)
-    collection_processed = ad.read_h5ad(os.path.join(f'/home/pcardenasg/ST/MICCAI25/SpaRED_data/original/{_A.dataset}.h5ad'))
-    # FIXME: reordenando los genes al orden original de SpaRED
+    collection_processed = ad.read_h5ad(os.path.join(f'{REPO_ROOT}/data/SparedData/{_A.dataset}.h5ad'))
     collection_processed = collection_processed[:, np.argsort(collection_processed.var['original_index'].astype(int))].copy()
     collection_processed.var.index = collection_processed.var['gene_ids']
     # Load training data
@@ -287,7 +284,7 @@ def main(_A: argparse.Namespace):
     evaluator = instantiate(_C.train.evaluator)
 
     checkpoint_manager = CheckpointManager(
-        output_dir,
+        output_dir or "/tmp",
         model=model,
         optimizer=optimizer,
         scheduler=scheduler,
@@ -300,7 +297,7 @@ def main(_A: argparse.Namespace):
     timer = Timer(start_iteration + 1, total_iterations=_C.train.num_iterations)
 
     # Create tensorboard writer, only in main process.
-    if dist.is_main_process():
+    if dist.is_main_process() and not _A.only_test:
         tboard = SummaryWriter(log_dir=output_dir)
 
     # -------------------------------------------------------------------------
@@ -449,16 +446,18 @@ def main(_A: argparse.Namespace):
     print("test PCC-Gene: ", test_metrics['PCC-Gene'])    
 
     wandb.log(test_logs)
-    preds_dir = os.path.join(output_dir, "preds", "eight_sym_test") if _A.eight_sym_test else os.path.join(output_dir, "preds")
+    # Only save predictions when training; --only_test writes nothing to disk.
+    if not _A.only_test:
+        preds_dir = os.path.join(output_dir, "preds", "eight_sym_test") if _A.eight_sym_test else os.path.join(output_dir, "preds")
 
-    os.makedirs(preds_dir, exist_ok=True)
-    torch.save(
-        {
-            _A.prediction_layer: test_labels.detach().cpu().numpy(),
-            "prediction": test_preds.detach().cpu().numpy(),
-        },
-        os.path.join(preds_dir, "test.pt")
-    )
+        os.makedirs(preds_dir, exist_ok=True)
+        torch.save(
+            {
+                _A.prediction_layer: test_labels.detach().cpu().numpy(),
+                "prediction": test_preds.detach().cpu().numpy(),
+            },
+            os.path.join(preds_dir, "test.pt")
+        )
 
 def val_and_save(train_dataloader, valid_dataloader, model, evaluator, top_k, iteration, checkpoint_manager, best_mse):
 
@@ -493,16 +492,3 @@ if __name__ == "__main__":
             dist_url=_A.dist_url,
             args=(_A,),
         )
-        # "tcp://127.0.0.1:5648" (default)
-        # "tcp://127.0.0.1:5649" 
-        # "tcp://127.0.0.1:5650"
-        # "tcp://127.0.0.1:5651"
-        # "tcp://127.0.0.1:5652"
-        # "tcp://127.0.0.1:5653"
-        # "tcp://127.0.0.1:5654"
-        # "tcp://127.0.0.1:5655"
-        # "tcp://127.0.0.1:5656"
-        # "tcp://127.0.0.1:5657"
-
-#CUDA_VISIBLE_DEVICES=5 python scripts/train_spared.py --config configs/train_meru_spared.py --num-gpus 1 --output-dir ./outputs_0.5 --dist-url tcp://127.0.0.1:5648 --dataset
-#CUDA_VISIBLE_DEVICES=7 python scripts/train_spared.py --config configs/train_meru_spared.py --num-gpus 1 --output-dir ./outputs_geneformer_uni --entail_weight 0.5 --num_genes 768 --dist-url tcp://127.0.0.1:5644 --dataset
