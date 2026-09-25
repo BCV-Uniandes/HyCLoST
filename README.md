@@ -126,7 +126,7 @@ CUDA_VISIBLE_DEVICES=0 python scripts/train_spared.py \
 The test MSE and PCC-Gene are printed at the end.
 
 - If the port in `--dist-url` is already in use, pick another one.
-- The script logs to [Weights & Biases](https://wandb.ai) (`project=HyCloST`, `entity=spared_v2`. set in the `wandb.init(...)` call of  `scripts/train_spared.py`). To run with [Weights & Biases](https://wandb.ai), replace `entity` with your own username or team, or run with `WANDB_MODE=disabled`.
+- The script logs to [Weights & Biases](https://wandb.ai) (`project=HyCloST`, `entity=spared_v2`, set in the `wandb.init(...)` call of  `scripts/train_spared.py`). To run with [Weights & Biases](https://wandb.ai), replace `entity` with your own username or team, or run with `WANDB_MODE=disabled`.
 
 ## Training
 
@@ -167,7 +167,7 @@ Each run creates a folder named after the start time:
     └── eight_sym_test/test.pt           # test predictions (preds/test.pt without --eight_sym_test)
 ```
 
-- **Checkpoint:** `k_<top_k>/checkpoint_best.pth` is overwritten every time the validation MSE improves, so at the end it holds the model with the lowest validation MSE, not the last one. It is a dictionary with `model`, `optimizer`, `scheduler`, `scaler` (the training states) and `iteration` (when it was saved). The best validation MSE can occur early in training, so check `iteration`.
+- **Checkpoint:** `k_<top_k>/checkpoint_best.pth` holds the model with the best validation MSE.
 - **Predictions:** `test.pt` is a dictionary with `prediction` (the predicted expression) and `c_StepB_log1p` (the ground truth), both NumPy arrays of shape `(num_test_spots, num_genes)`.
 
 ## Citation
