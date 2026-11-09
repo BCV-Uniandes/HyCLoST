@@ -47,7 +47,7 @@ data/SparedData/
 
 ### 2. Download the precomputed embeddings
 
-HyCLoST works on frozen, precomputed features: [UNI2-h](https://huggingface.co/MahmoodLab/UNI2-h) features of the histology patches and [Geneformer](https://huggingface.co/ctheodoris/Geneformer) embeddings of the gene expression vectors. Download them from `<EMBEDDINGS_DRIVE_LINK>` and place them in `embeddings/` at the root of the repository:
+HyCLoST works on frozen, precomputed features: [UNI2-h](https://huggingface.co/MahmoodLab/UNI2-h) features of the histology patches and [Geneformer](https://huggingface.co/ctheodoris/Geneformer) embeddings of the gene expression vectors. Download them from [HERE](https://drive.google.com/drive/folders/1n6-Eu2SztkQ739cNbdEqm3uPObkoCf16?usp=drive_link) and place them in `embeddings/` at the root of the repository:
 
 ```
 embeddings/
