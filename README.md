@@ -68,7 +68,7 @@ embeddings/
 
 ### 3. Download the checkpoints
 
-Download the checkpoints from `<CHECKPOINTS_DRIVE_LINK>` and place the `checkpoints/` folder at the root of the repository. Each dataset has one model in `best_run/`:
+Download the checkpoints from [HERE](https://drive.google.com/file/d/1Li0WicA5oIlNNMR1ufX8mWwY9UimB5tm/view?usp=drive_link) and place the `checkpoints/` folder at the root of the repository. Each dataset has one model in `best_run/`:
 
 ```
 checkpoints/
